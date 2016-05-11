@@ -609,41 +609,41 @@ bool SharedAlgorithm::thereIsNoDirtOrStarsInMap(){
 Direction SharedAlgorithm::bfs(Point rootPoint, Point target, Point* wanted_point){
 	map<Point, int> m;
 	set <Point> s;
-	queue<forBfs*> queue;
-	forBfs* root = new forBfs(rootPoint, rootPoint, 0);//this is the root, it's parent isn't matter. 
+	queue<forBfs> queue;
+	forBfs root(rootPoint, rootPoint, 0);//this is the root, it's parent isn't matter. 
 	queue.push(root);
-	forBfs * thisNode = nullptr, *childNode = nullptr;
+	//forBfs thisNode , childNode;
 	int min_dist = map_info.size();
 	bool first_iter = true;
 	Point parentPoint, bestPoint;
 	if (rootPoint == target) return Direction::Stay;
 
 	while (!queue.empty()){
-		thisNode = queue.front();
+		forBfs thisNode = queue.front();
 		queue.pop();
-		if (s.find(thisNode->getCurrPoint()) != s.end()){//if we check this point, we don't want to check it again.
+		if (s.find(thisNode.getCurrPoint()) != s.end()){//if we check this point, we don't want to check it again.
 			continue;
 		}
 		m.clear();
-		legalMoves(m, 1, thisNode->getCurrPoint());//update m to be only legal directions
+		legalMoves(m, 1, thisNode.getCurrPoint());//update m to be only legal directions
 		map<Point, int>::iterator it;
 		for (it = m.begin(); it != m.end(); it++) {
-			parentPoint = (first_iter) ? it->first : thisNode->getParentPoint();
+			parentPoint = (first_iter) ? it->first : thisNode.getParentPoint();
 			if (s.find(it->first) != s.end()){//if we check this point, we don't want to check it again.
 				continue;
 			}
-			childNode = new forBfs(it->first, parentPoint, thisNode->getDist_from_root() + 1);
+			forBfs childNode(it->first, parentPoint, thisNode.getDist_from_root() + 1);
 			queue.push(childNode);
-			if ((min_dist > childNode->getDist_from_root())&& (it->first==target)){
-				min_dist = childNode->getDist_from_root();
-				bestPoint = childNode->getParentPoint();
+			if ((min_dist > childNode.getDist_from_root())&& (it->first==target)){
+				min_dist = childNode.getDist_from_root();
+				bestPoint = childNode.getParentPoint();
 			}
 
 		}
 
 
 		first_iter = false;
-		s.insert(thisNode->getCurrPoint());
+		s.insert(thisNode.getCurrPoint());
 
 		
 
@@ -662,41 +662,41 @@ Direction SharedAlgorithm::bfs(Point rootPoint, Point target, Point* wanted_poin
 int SharedAlgorithm::bfs_dist(Point rootPoint, Point target){
 	map<Point, int> m;
 	set <Point> s;
-	queue<forBfs*> queue;
-	forBfs* root = new forBfs(rootPoint, rootPoint, 0);//this is the root, it's parent isn't matter. 
+	queue<forBfs> queue;
+	forBfs root(rootPoint, rootPoint, 0);//this is the root, it's parent isn't matter. 
 	queue.push(root);
-	forBfs * thisNode = nullptr, *childNode = nullptr;
+	//forBfs * thisNode = nullptr, *childNode = nullptr;
 	int min_dist = map_info.size();
 	bool first_iter = true;
 	Point parentPoint, bestPoint;
 	if (rootPoint == target) return 0;
 
 	while (!queue.empty()){
-		thisNode = queue.front();
+		forBfs thisNode = queue.front();
 		queue.pop();
-		if (s.find(thisNode->getCurrPoint()) != s.end()){//if we check this point, we don't want to check it again.
+		if (s.find(thisNode.getCurrPoint()) != s.end()){//if we check this point, we don't want to check it again.
 			continue;
 		}
 		m.clear();
-		legalMoves(m, 1, thisNode->getCurrPoint());//update m to be only legal directions
+		legalMoves(m, 1, thisNode.getCurrPoint());//update m to be only legal directions
 		map<Point, int>::iterator it;
 		for (it = m.begin(); it != m.end(); it++) {
-			parentPoint = (first_iter) ? it->first : thisNode->getParentPoint();
+			parentPoint = (first_iter) ? it->first : thisNode.getParentPoint();
 			if (s.find(it->first) != s.end()){//if we check this point, we don't want to check it again.
 				continue;
 			}
-			childNode = new forBfs(it->first, parentPoint, thisNode->getDist_from_root() + 1);
+			forBfs childNode(it->first, parentPoint, thisNode.getDist_from_root() + 1);
 			queue.push(childNode);
-			if ((min_dist > childNode->getDist_from_root()) && (it->first == target)){
-				min_dist = childNode->getDist_from_root();
-				bestPoint = childNode->getParentPoint();
+			if ((min_dist > childNode.getDist_from_root()) && (it->first == target)){
+				min_dist = childNode.getDist_from_root();
+				bestPoint = childNode.getParentPoint();
 			}
 
 		}
 
 
 		first_iter = false;
-		s.insert(thisNode->getCurrPoint());
+		s.insert(thisNode.getCurrPoint());
 
 
 
