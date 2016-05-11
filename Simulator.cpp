@@ -73,9 +73,10 @@ void Simulator::run(vector<string> algoNames,vector<string> houseNames) {
 	}
 
 
-	Point* point = new Point(-1, -1);
 
 	for (vector<House*>::size_type i = 0; i != houses.size(); i++) {
+		Point* point = new Point(-1, -1);
+
 		createScore(0, 0, 0, false, 0, 0, &score);
 		int Steps = houses[i]->getmaxSteps(), pos_in_competition = 1, actual_position_in_copmetition = 1,sum_dirt = houses[i]->sumDirt();
 		int simulation_steps = 0, winner_num_steps = 0, num_of_wins_this_iter = 0;
@@ -185,6 +186,8 @@ void Simulator::run(vector<string> algoNames,vector<string> houseNames) {
 			}
 
 		}
+	delete point;
+
 
 
 	}
@@ -194,7 +197,6 @@ void Simulator::run(vector<string> algoNames,vector<string> houseNames) {
 	Table table(houseNames, algoNames, robots);
 	table.printTable();
 
-	delete point;
 	for (auto it = robots.begin(); it != robots.end(); ++it) {
 		delete *it;
 	}
