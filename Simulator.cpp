@@ -26,7 +26,7 @@ void Simulator::setInputConfig(map<string, int> input_config) {
 void Simulator::setInputAlgo(vector <AbstractAlgorithm*> input_algorithms) {
 	algorithms = input_algorithms;
 }
- 
+
 
 //update the input score with all the parameters
 void Simulator::createScore(int winner_num_stepsint, int num_steps, int pos_in_comeptition, bool is_back_docking, int dirt_collected, int sum_Dirth_House, Score *score) {
@@ -65,8 +65,8 @@ void PrintTable(vector<Robot*> robots, vector<string> houseNames, vector<string>
 void Simulator::run(vector<string> algoNames,vector<string> houseNames) {
 
 	vector <Robot*> robots;
- 	Score score;
-
+	Score score;
+	//int aboutToFinish = 0;
 
 	for (vector<AbstractAlgorithm*>::size_type i = 0; i != algorithms.size(); i++) {
 		algorithms[i]->setConfiguration(config);
@@ -76,7 +76,7 @@ void Simulator::run(vector<string> algoNames,vector<string> houseNames) {
 
 	for (vector<House*>::size_type i = 0; i != houses.size(); i++) {
 		Point* point = new Point(-1, -1);
-
+ 
 		createScore(0, 0, 0, false, 0, 0, &score);
 		int Steps = houses[i]->getmaxSteps(), pos_in_competition = 1, actual_position_in_copmetition = 1,sum_dirt = houses[i]->sumDirt();
 		int simulation_steps = 0, winner_num_steps = 0, num_of_wins_this_iter = 0;

@@ -9,6 +9,8 @@ Direction _203246509_C::step(Direction prevStep) {
 }
 
 
-extern "C" AbstractAlgorithm* maker() {
-	return new _203246509_C();
-}
+//extern "C" AbstractAlgorithm* maker() {
+//	return new _203246509_C();
+//}
+
+REGISTER_ALGORITHM(_203246509_C)

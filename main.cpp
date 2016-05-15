@@ -1,4 +1,6 @@
 #include "FuncForMain.h"
+#include "AlgorithmRegistration.h"
+#include "AlgorithmRegistrar.h"
 #include <dlfcn.h>
 
 typedef AbstractAlgorithm* (*algoCreator)();
@@ -8,6 +10,7 @@ int main(int argc, char* argv[]) {
 	vector <fs::path> fileName_currDir;
 	vector <House*> houses;
 	vector <AbstractAlgorithm*> algos;
+	vector<unique_ptr<AbstractAlgorithm>> Algos;
 	map<string, int> config;
 	map<string, string> ErrorMSGHouse;
 	map<string, string> ErrorMSGAlgo;
@@ -22,22 +25,39 @@ int main(int argc, char* argv[]) {
 	if (!checkConfig(config_mapName.begin()->first, &config, config_path)) {
 		return 1;
 	}
+	//AlgorithmRegistrar* algoRegistrar = new AlgorithmRegistrar();
 	for (auto algoSoFilesNames : algo_mapName) {
-		const char* tmpname = algoSoFilesNames.first.c_str();
-		void* handler = dlopen(tmpname, RTLD_NOW);
-		if (handler == nullptr) {
+		int resNum = AlgorithmRegistrar::getInstance().loadAlgorithm(algoSoFilesNames.first, algoSoFilesNames.second);
+		if (resNum == -1){
 			ErrorMSGAlgo[algoSoFilesNames.first] = "file cannot be loaded or is not a valid .so";
 			continue;
 		}
-		algoCreator alg;
-		*(void **)(&alg) = dlsym(handler, "maker");
-		if (alg == nullptr) {
+		else if (resNum == -2){
 			ErrorMSGAlgo[algoSoFilesNames.first] = "valid .so but no algorithm was registered after loading it";
 			continue;
 		}
-		AbstractAlgorithm* loadedAlgo = alg();
-		algos.push_back(loadedAlgo);
-		handlersVector.push_back(handler);
+
+		//void* handler = dlopen(tmpname, RTLD_NOW);
+		//if (handler == nullptr) {
+		//	ErrorMSGAlgo[algoSoFilesNames.first] = "file cannot be loaded or is not a valid .so";
+		//	continue;
+		//}
+	
+
+
+		//algoCreator alg;
+		//*(void **)(&alg) = dlsym(handler, "maker");
+		//if (alg == nullptr) {
+		//	ErrorMSGAlgo[algoSoFilesNames.first] = "valid .so but no algorithm was registered after loading it";
+		//	continue;
+		//}
+		//AbstractAlgorithm* loadedAlgo = alg();
+		//algos.push_back(loadedAlgo);
+		//handlersVector.push_back(handler);
+	}
+	Algos = AlgorithmRegistrar::getInstance().getAlgorithms();
+	for (vector<unique_ptr<AbstractAlgorithm>>::size_type k = 0; k != Algos.size(); k++) {
+		algos.push_back(Algos[k].release());
 	}
 	int numberOfValidAlgo = algos.size();
 	//	cout << numberOfValidHouses << numberOfValidAlgo << endl;
@@ -53,7 +73,7 @@ int main(int argc, char* argv[]) {
 		if (houses.size() == 0)
 			cout << "All house files in target folder " << "'" << house_path << "'" << " cannot be opened or are invalid:" << endl;
 		PrintErrors(ErrorMSGHouse, houses_mapName, "house");
-		if (algos.size() == 0)
+		if (Algos.size() == 0)
 			cout << "All algorithm files in target folder " << "'" << algo_path << "'" << " cannot be opened or are invalid:" << endl;
 		PrintErrors(ErrorMSGAlgo, algo_mapName, "so");
 	}
@@ -62,8 +82,8 @@ int main(int argc, char* argv[]) {
 	for (auto it = algos.begin(); it != algos.end(); ++it) {
 		delete *it;
 	}
-	for (auto it = handlersVector.begin(); it != handlersVector.end(); it++)
-		dlclose(*it);
+	//for (auto it = handlersVector.begin(); it != handlersVector.end(); it++)
+	//	dlclose(*it);
 	houses.clear();
 	algos.clear();
 

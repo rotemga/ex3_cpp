@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <queue>  
 #include <set>
+#include "make_unique.h"
+#include "AlgorithmRegistration.h"
 
 using namespace std;
 class SharedAlgorithm :

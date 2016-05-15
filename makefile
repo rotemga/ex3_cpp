@@ -1,7 +1,7 @@
 $(TARGET)
 TARGET := simulator
 CFLAGS := -std=c++11 -O2 -Wall -pedantic -pthread
-O_FILES:= main.o Battery.o House.o OurSensor.o Point.o Robot.o Score.o SimpleIniFileParser.o Simulator.o FuncForMain.o Table.o SharedAlgorithm.o forBfs.o
+O_FILES:= main.o Battery.o House.o OurSensor.o Point.o Robot.o Score.o SimpleIniFileParser.o Simulator.o FuncForMain.o Table.o SharedAlgorithm.o forBfs.o AlgorithmRegistration.o AlgorithmRegistrar.o
  
 default :
 	make all
@@ -11,10 +11,10 @@ all : $(TARGET) _203246509_A.o _203246509_B.o _203246509_C.o 203246509_A_.so 203
 $(TARGET): $(O_FILES)
 	g++ -o $(TARGET) $(O_FILES) -std=c++11 -O2 -Wall -pedantic -pthread -L/usr/local/boost/boost_1_50_0/stage/lib -lboost_filesystem -lboost_system -ldl -rdynamic
 
-main.o: main.cpp FuncForMain.h
+main.o: main.cpp FuncForMain.h AlgorithmRegistrar.h
 	g++ -c $(CFLAGS) $*.cpp -L/usr/local/boost/boost_1_50_0/stage/lib -lboost_filesystem -lboost_system -ldl -rdynamic
 
-SharedAlgorithm.o: SharedAlgorithm.cpp SharedAlgorithm.h AbstractAlgorithm.h AbstractSensor.h OurSensor.h forBfs.h
+SharedAlgorithm.o: SharedAlgorithm.cpp SharedAlgorithm.h AbstractAlgorithm.h AbstractSensor.h OurSensor.h forBfs.h AlgorithmRegistration.h make_unique.h
 	g++ -c $(CFLAGS) $*.cpp
 
 _203246509_A.o: _203246509_A.cpp _203246509_A.h SharedAlgorithm.h 
@@ -68,6 +68,13 @@ Simulator.o: Simulator.cpp Simulator.h House.h Score.h AbstractAlgorithm.h Abstr
 
 forBfs.o: forBfs.cpp forBfs.h
 	g++ -c $(CFLAGS) $*.cpp 
+
+AlgorithmRegistration.o: AlgorithmRegistration.cpp AlgorithmRegistration.h AlgorithmRegistrar.h
+	g++ -c $(CFLAGS) $*.cpp 
+
+AlgorithmRegistrar.o: AlgorithmRegistrar.cpp AlgorithmRegistrar.h
+	g++ -c $(CFLAGS) $*.cpp 
+
 
 
 
