@@ -20,13 +20,13 @@ public:
 	SimpleIniFileParser(const string& iniPath);
 	bool loadFromFile(const string& iniPath);
 	string toString();
-	map<string, int> getMap();
+	map<string, string> getMap();
 	operator bool() const {
 		return successOpenFile;
 	}
 
 private:
-	map<string, int> parameters;
+	map<string, string> parameters;
 	bool successOpenFile;
 
 	static vector<string> split(const string &s, char delim) {
@@ -53,7 +53,7 @@ private:
 		{
 			return;
 		}
-		this->parameters[trim(tokens[0])] = stoi(tokens[1]);
+		this->parameters[trim(tokens[0])] = tokens[1];
 	}
 
 };

@@ -16,6 +16,7 @@ class Robot
 	Battery* battery;
 	Score score;
 	bool canRun;
+	bool crashedWall;
 	bool brokedDown;
 	Direction prevStep;
 
@@ -40,7 +41,9 @@ public:
 	bool isBrokedDown() const {
 		return brokedDown;
 	}
-
+	bool isCrashedWall() const {
+		return crashedWall;
+	}
 	void setCanRun(bool canRun) {
 		this->canRun = canRun;
 	}

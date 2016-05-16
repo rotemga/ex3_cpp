@@ -25,7 +25,7 @@ bool SimpleIniFileParser::loadFromFile(const string& iniPath)
 string SimpleIniFileParser::toString()
 	{
 		string out;
-		for (map<string, int>::const_iterator itr = this->parameters.begin();
+		for (map<string, string>::const_iterator itr = this->parameters.begin();
 			itr != this->parameters.end();
 			++itr)
 		{
@@ -33,13 +33,13 @@ string SimpleIniFileParser::toString()
 			{
 				out += "\n";
 			}
-			out += "parameters[" + itr->first + "] = " + to_string(itr->second);
+			out += "parameters[" + itr->first + "] = " +itr->second;
 		}
 		return out;
 	}
 
 
-map<string, int> SimpleIniFileParser::getMap(){
+map<string, string> SimpleIniFileParser::getMap(){
 	return parameters;
 }
 

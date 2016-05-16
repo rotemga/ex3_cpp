@@ -2,6 +2,10 @@
 #ifndef SCORE_H_
 #define SCORE_H_
 
+
+#include <map>
+#include <string>
+using namespace std;
 class Score {
 	int position;
 	int winnerNumSteps;
@@ -13,9 +17,9 @@ class Score {
 public:
 	Score();
 	virtual ~Score();
-	int calcResult();
-	// should add operator overloading for <
-
+	int calcResult();   
+	void createMapForScore(map<string, int> & mapForScore);
+	//int calc_score(map<string, int> mapForScore);
 	int getDirtCollected() const {
 		return dirtCollected;
 	}

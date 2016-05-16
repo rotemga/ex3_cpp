@@ -8,6 +8,7 @@ Robot::Robot(House *house, AbstractAlgorithm *algo, Point* docking,
 	score.setPosition(10);
 	canRun = true;
 	brokedDown = false;
+	crashedWall = false;
 	algo->setSensor(*sensor);
 	prevStep = Direction::Stay;
 }
@@ -40,6 +41,7 @@ void Robot::runRobot() {
 
 		if (crashedToWall(*position)) {
 			canRun = false;
+			crashedWall = true;
 			brokedDown = true;
 			return;
 		}

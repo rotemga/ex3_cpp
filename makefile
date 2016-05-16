@@ -6,13 +6,18 @@ O_FILES:= main.o Battery.o House.o OurSensor.o Point.o Robot.o Score.o SimpleIni
 default :
 	make all
 
-all : $(TARGET) _203246509_A.o _203246509_B.o _203246509_C.o 203246509_A_.so 203246509_B_.so 203246509_C_.so
+all : $(TARGET) _203246509_A.o _203246509_B.o _203246509_C.o scoreCreator.o 203246509_A_.so 203246509_B_.so 203246509_C_.so scoreCreator.so
 
 $(TARGET): $(O_FILES)
 	g++ -o $(TARGET) $(O_FILES) -std=c++11 -O2 -Wall -pedantic -pthread -L/usr/local/boost/boost_1_50_0/stage/lib -lboost_filesystem -lboost_system -ldl -rdynamic
 
-main.o: main.cpp FuncForMain.h AlgorithmRegistrar.h
+main.o: main.cpp FuncForMain.h AlgorithmRegistrar.h Score.h
 	g++ -c $(CFLAGS) $*.cpp -L/usr/local/boost/boost_1_50_0/stage/lib -lboost_filesystem -lboost_system -ldl -rdynamic
+
+scoreCreator.o: 
+	g++ -c -fPIC $(CFLAGS) $*.cpp
+scoreCreator.so:
+	g++ scoreCreator.o -shared -o score_formula.so
 
 SharedAlgorithm.o: SharedAlgorithm.cpp SharedAlgorithm.h AbstractAlgorithm.h AbstractSensor.h OurSensor.h forBfs.h AlgorithmRegistration.h make_unique.h
 	g++ -c $(CFLAGS) $*.cpp
@@ -35,7 +40,7 @@ _203246509_C.o: _203246509_C.cpp _203246509_C.h SharedAlgorithm.h
 203246509_C_.so : _203246509_C.o
 	g++ _203246509_C.o -shared -o 203246509_C_.so	
 
-Table.o: Table.cpp Table.h Robot.h
+Table.o: Table.cpp Table.h Robot.h Simulator.h
 	g++ -c $(CFLAGS) $*.cpp 
 	
 FuncForMain.o: FuncForMain.cpp FuncForMain.h House.h Simulator.h SimpleIniFileParser.h

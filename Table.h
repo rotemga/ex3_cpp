@@ -4,7 +4,7 @@
 #define PLACE_FOR_ALGO 13
 #define PLACE_FOR_HOUSE 10
 #define SEPRATE_CHAR "|"
-
+typedef int(*scoreFunc)(const map<string, int>&);
 class Table
 {
 	int n, m;
@@ -18,7 +18,7 @@ class Table
 public:
 	void printEmptyLine();
 	void printHouseNamesLine();
-	void printTable();
+	bool printTable(scoreFunc scorefunc);
 	Table(vector<string> houseNames1, vector<string> algoNames1, vector<Robot*> robots1) : houseNames(houseNames1),
 		algoNames(algoNames1), robots(robots1) {
 		n = algoNames.size();

@@ -4,8 +4,10 @@
 #define HOUSE_COMMAND "-house_path"
 #define ALGO_COMMAND "-algorithm_path"
 #define CONFIG_PATH "-config"
+#define SCORE_PATH "-score_formula"
 #define LEFTB "["
 #define RIGHTB "]"
+
 
 
 bool hasEnding(string const &fullString, string const &ending) {
@@ -45,16 +47,34 @@ void PrintErrors(map<string, string> errorMap, map<string, string> nameMap, stri
 		cout << nameMap[it->first] << "." << typefile << ": " << it->second << endl;
 	}
 }
+inline bool isInteger(const std::string & s)
+{
+	if (s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false;
 
-void checkVectorByMap(map<string, int> map1, vector<string> vector1, vector<bool>* boolV) {
+	char * p;
+	strtol(s.c_str(), &p, 10);
+
+	return (*p == 0);
+}
+bool badValue(const string& str) {
+	if (!isInteger(str))
+		return true;
+	return stoi(str) <= 0;
+}
+
+void checkVectorByMap(map<string, string> map1, vector<string> vector1, vector<bool>* boolV) {
 	for (size_t i = 0; i < vector1.size(); i++) {
 		(*boolV)[i] = !(map1.find(vector1[i]) == map1.end());
 	}
 }
-
-void  printConfiError(int numberOfMissing, vector<bool> checkAllConfi, vector<string> confiVector) {
+void checkBadValues(map<string,string> map1,vector<string> vec1, vector<bool>* boolV) {
+	for (unsigned int i = 0; i < vec1.size(); i++) {
+		(*boolV)[i] = (!badValue(map1[vec1[i]]));
+	}
+}
+void  printConfiError(int numberOfMissing, vector<bool> checkAllConfi, vector<string> confiVector,string msg) {
 	int cnt = 0;
-	cout << "config.ini missing " << numberOfMissing << " parameter(s): ";
+	cout << msg << numberOfMissing << " parameter(s): ";
 	for (size_t i = 0; i < checkAllConfi.size(); i++) {
 		if (!checkAllConfi[i]) {
 			cnt++;
@@ -65,8 +85,7 @@ void  printConfiError(int numberOfMissing, vector<bool> checkAllConfi, vector<st
 	cout << endl;
 
 }
-
-bool checkConfig(string fileName, map<string, int>* config, string config_path) {
+bool checkConfig(string fileName, map<string, string>* config, string config_path) {
 	SimpleIniFileParser iniParser(fileName);
 	if (!iniParser) {
 		cout << "config.ini exists in '" << config_path << "' but cannot be opened" << endl;
@@ -81,7 +100,15 @@ bool checkConfig(string fileName, map<string, int>* config, string config_path) 
 	unsigned int numberOfMissingConfi;
 	numberOfMissingConfi = std::count(checkAllConfi.begin(), checkAllConfi.end(), false);
 	if (numberOfMissingConfi > 0) {
-		printConfiError(numberOfMissingConfi, checkAllConfi, confiVector);
+		printConfiError(numberOfMissingConfi, checkAllConfi, confiVector, "config.ini missing ");
+		return false;
+	}
+	//after knowing that no missing confi,check bad value with the same vector
+	checkBadValues(*config, confiVector, &checkAllConfi);
+	unsigned int numberOfBadConfi;
+	numberOfBadConfi = std::count(checkAllConfi.begin(), checkAllConfi.end(), false);
+	if (numberOfBadConfi > 0) {
+		printConfiError(numberOfBadConfi, checkAllConfi, confiVector, "config.ini having bad values for ");
 		return false;
 	}
 	return true;
@@ -116,10 +143,16 @@ int findIndexOfElem(vector<string> Names, string name) {
 		return  std::distance(Names.begin(), it);
 	}
 }
-void checkArguments(int argc, char** argv, string& config_path, string& algo_path, string& house_path) {
+void checkArguments(int argc, char** argv, string& config_path, string& algo_path, string& house_path,string& score_path) {
 	vector<string> commandLineOptions(argc - 1);
 	for (int i = 1; i < argc; i++)
 		commandLineOptions[i - 1] = argv[i];
+	int pos_score = findIndexOfElem(commandLineOptions, "-score_formula");
+	cout << "score is " << pos_score << endl;
+	if (pos_score < static_cast<int>(commandLineOptions.size()) - 1 && pos_score != -1)
+		score_path = commandLineOptions[pos_score + 1];
+	else
+		score_path = "";
 	int pos_algo = findIndexOfElem(commandLineOptions, ALGO_COMMAND);
 	if (pos_algo < static_cast<int>(commandLineOptions.size()) - 1 && pos_algo != -1)
 		algo_path = commandLineOptions[pos_algo + 1];
@@ -137,30 +170,11 @@ void checkArguments(int argc, char** argv, string& config_path, string& algo_pat
 		config_path = fs::current_path().string();
 }
 
-
-
-void updateCurrDir(vector<fs::path>* fileName_currDir) {
-	//at least one of the arguments were missing
-	//create vector that containe all files in the current directory
-	fs::path full_path_dir(fs::current_path());
-	fs::directory_iterator end_iter;
-	if (fs::exists(full_path_dir) && fs::is_directory(full_path_dir))
-	{
-		for (fs::directory_iterator dir_iter(full_path_dir); dir_iter != end_iter; ++dir_iter)
-		{
-			if (fs::is_regular_file(dir_iter->status()))
-			{
-				fs::path tmp1 = *dir_iter;
-				(*fileName_currDir).push_back(tmp1);
-			}
-		}
-	}
-}
-
-bool updateFilesFromDirectory(map<string, string>& fileNameMap, string typeFiles, string directory) {
+bool updateFilesFromDirectory(map<string, string>& fileNameMap, string typeFiles, string& directory) {
 
 	fs::path p(directory);
 	fs::path fullpath_dir(fs::complete(p));
+	directory = fullpath_dir.string();
 	fs::directory_iterator end_iter;
 	if (fs::exists(fullpath_dir) && fs::is_directory(fullpath_dir)) {
 		for (fs::directory_iterator dir_iter(fullpath_dir); dir_iter != end_iter; dir_iter++) {
@@ -174,8 +188,19 @@ bool updateFilesFromDirectory(map<string, string>& fileNameMap, string typeFiles
 	return fileNameMap.size() > 0;
 }
 
-void Usage(string house_path, string config_path, string algo_path) {
+void Usage(string house_path, string config_path, string algo_path,bool house_exist,bool config_exist,bool algo_exist) {
 	cout << "Usage: simulator " << LEFTB << CONFIG_PATH << " " << config_path << RIGHTB << " " << LEFTB << HOUSE_COMMAND << " "
 		<< house_path << RIGHTB << " " << LEFTB << ALGO_COMMAND << " " << algo_path << RIGHTB << endl;
+	if (!house_exist)
+		cout << "cannot find house files in '" << house_path << "'" << endl;
+	if (!config_exist)
+		cout << "cannot find config.ini files in '" << config_path << "'" << endl;
+	if (!algo_exist)
+		cout << "cannot find algorithm files in '" << algo_path << "'" << endl;
 
+
+}
+void convertToMapInt(map <string, string>& stringMap, map<string, int>* intMap) {
+	for (auto&  elem : stringMap)
+		(*intMap)[elem.first] = stoi(elem.second);
 }
